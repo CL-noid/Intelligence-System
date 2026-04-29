@@ -1,0 +1,406 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>涡轮叶片智能评价系统</title>
+  <link rel="stylesheet" href="style.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Share+Tech+Mono&display=swap" rel="stylesheet"/>
+</head>
+<body>
+
+  <!-- ===== HERO ===== -->
+  <header class="hero">
+    <div class="scanline"></div>
+    <div class="grid-overlay"></div>
+    <div class="hero-content">
+      <p class="hero-label">// PROJECT PRESENTATION</p>
+      <h1 class="hero-title">航空发动机涡轮叶片服役微观损伤<br/><span>智能评价系统</span></h1>
+      <p class="hero-sub">北京航空航天大学"冯如杯"参赛作品</p>
+    </div>
+    <div class="corner tl"></div>
+    <div class="corner tr"></div>
+    <div class="corner bl"></div>
+    <div class="corner br"></div>
+  </header>
+
+  <!-- ===== MODULES (4 equal columns) ===== -->
+  <main class="modules">
+    <div class="module" id="mod-1" data-module="1" role="button" tabindex="0">
+      <div class="module-left">
+        <div class="module-index">01</div>
+        <div class="module-body">
+          <h2 class="module-title">图像阈值分割</h2>
+          <p class="module-desc">分割真实显微图像，以便于后续处理</p>
+        </div>
+      </div>
+      <div class="module-right">
+        <img class="module-img" src="assets/1.png" alt="模块示意图"/>
+      </div>
+      <div class="module-arrow">→</div>
+      <div class="module-glow"></div>
+    </div>
+
+    <div class="module" id="mod-2" data-module="2" role="button" tabindex="0">
+      <div class="module-left">
+        <div class="module-index">02</div>
+        <div class="module-body">
+          <h2 class="module-title">图像特征提取</h2>
+          <p class="module-desc">提取图像特征，用于评估寿命、预测图像</p>
+        </div>
+      </div>
+      <div class="module-right">
+        <img class="module-img" src="assets/2.png" alt="模块示意图"/>
+      </div>
+      <div class="module-arrow">→</div>
+      <div class="module-glow"></div>
+    </div>
+
+    <div class="module" id="mod-3" data-module="3" role="button" tabindex="0">
+      <div class="module-left">
+        <div class="module-index">03</div>
+        <div class="module-body">
+          <h2 class="module-title">剩余寿命预测</h2>
+          <p class="module-desc">根据图像参数预测涡轮叶片剩余寿命情况</p>
+        </div>
+      </div>
+      <div class="module-right">
+        <img class="module-img" src="assets/3.png" alt="模块示意图"/>
+      </div>
+      <div class="module-arrow">→</div>
+      <div class="module-glow"></div>
+    </div>
+
+    <div class="module" id="mod-4" data-module="4" role="button" tabindex="0">
+      <div class="module-left">
+        <div class="module-index">04</div>
+        <div class="module-body">
+          <h2 class="module-title">一键寿命评估</h2>
+          <p class="module-desc">上传图像直接获取剩余寿命预测结果</p>
+        </div>
+      </div>
+      <div class="module-right">
+        <img class="module-img" src="assets/4.png" alt="模块示意图"/>
+      </div>
+      <div class="module-arrow">→</div>
+      <div class="module-glow"></div>
+    </div>
+  </main>
+
+  <!-- ===== MODAL ===== -->
+  <div class="modal-backdrop" id="modalBackdrop" aria-hidden="true">
+    <div class="modal-panel" id="modalPanel" role="dialog" aria-modal="true">
+      <div class="modal-header">
+        <div class="modal-header-left">
+          <span class="modal-index" id="modalIndex">01</span>
+          <div class="modal-header-text">
+            <p class="modal-label" id="modalLabel">MODULE</p>
+            <h2 class="modal-title" id="modalTitle">模块标题</h2>
+          </div>
+        </div>
+        <button class="modal-close" id="modalClose" aria-label="关闭">
+          <span class="close-icon">✕</span>
+          <span class="close-label">ESC</span>
+        </button>
+      </div>
+      <div class="modal-divider">
+        <div class="modal-divider-line"></div>
+        <span class="modal-divider-dot"></span>
+      </div>
+      <div class="modal-body" id="modalBody"></div>
+    </div>
+  </div>
+
+  <!-- ===== MODULE 1 TEMPLATE ===== -->
+  <template id="tpl-segmentation">
+    <div class="seg-layout">
+      <div class="seg-status-bar">
+        <span class="seg-status-dot" id="segStatusDot"></span>
+        <span class="seg-status-text" id="segStatusText">正在检测模型状态…</span>
+      </div>
+      <div class="seg-columns">
+        <div class="seg-col">
+          <p class="seg-col-label">// 输入图像</p>
+          <div class="drop-zone" id="dropZone">
+            <input type="file" id="fileInput" accept=".png,.jpg,.jpeg,.bmp,.tif,.tiff" multiple hidden/>
+            <div class="drop-icon">⬆</div>
+            <p class="drop-main">拖拽图像至此处</p>
+            <p class="drop-sub">或点击选择文件（支持多张批量处理）</p>
+            <p class="drop-formats">PNG · JPG · BMP · TIF</p>
+          </div>
+          <div class="ext-file-list" id="segFileList" style="display:none"></div>
+          <div class="img-preview-wrap" id="inputPreviewWrap" style="display:none">
+            <img id="inputPreview" class="img-preview" alt="input"/>
+            <div class="img-meta" id="inputMeta"></div>
+          </div>
+          <button class="seg-btn" id="runBtn" disabled><span class="seg-btn-icon">▶</span> 运行分割</button>
+        </div>
+        <div class="seg-col">
+          <p class="seg-col-label">// 分割结果</p>
+          <div class="result-box" id="resultBox">
+            <div class="result-placeholder" id="resultPlaceholder">
+              <span class="result-ph-icon">◈</span><span>结果将在此处显示</span>
+            </div>
+            <div class="result-loading" id="resultLoading" style="display:none">
+              <div class="loader-ring"></div>
+              <p class="loader-text" id="loaderText">正在分割…</p>
+            </div>
+            <img id="resultImg" class="img-preview" style="display:none" alt="result"/>
+          </div>
+          <!-- 批量导航 -->
+          <div class="ext-nav" id="segNav" style="display:none">
+            <button class="ext-nav-btn" id="segPrev">◀</button>
+            <span class="ext-nav-label" id="segNavLabel">图像 1 / 1</span>
+            <button class="ext-nav-btn" id="segNext">▶</button>
+          </div>
+          <div class="seg-actions" id="segActions" style="display:none">
+            <button class="seg-btn seg-btn-secondary" id="downloadBtn"><span class="seg-btn-icon">↓</span> 下载当前结果</button>
+            <button class="seg-btn seg-btn-secondary" id="downloadAllBtn"><span class="seg-btn-icon">↓</span> 下载全部（ZIP）</button>
+            <button class="seg-btn seg-btn-secondary" id="resetBtn"><span class="seg-btn-icon">↺</span> 重置</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </template>
+
+  <!-- ===== MODULE 2 TEMPLATE ===== -->
+  <template id="tpl-extraction">
+    <div class="ext-layout">
+      <div class="ext-notice">
+        <span class="ext-notice-icon">ℹ</span>
+        请上传<strong>二值化图像</strong>（黑白分割结果）。支持批量上传多张。
+      </div>
+      <div class="ext-controls">
+        <div class="ext-ctrl-group">
+          <p class="seg-col-label">// 上传图像</p>
+          <div class="drop-zone" id="extDropZone">
+            <input type="file" id="extFileInput" accept=".png,.jpg,.jpeg,.bmp,.tif,.tiff" multiple hidden/>
+            <div class="drop-icon">⬆</div>
+            <p class="drop-main">拖拽或点击上传（支持多张）</p>
+            <p class="drop-formats">PNG · JPG · BMP · TIF</p>
+          </div>
+          <div class="ext-file-list" id="extFileList" style="display:none"></div>
+        </div>
+        <div class="ext-ctrl-group">
+          <p class="seg-col-label">// 参数设置</p>
+          <div class="ext-param-row">
+            <label class="ext-param-label">放大倍数</label>
+            <div class="ext-select-wrap">
+              <select class="ext-select" id="extMag">
+                <option value="3k">3k</option><option value="5k">5k</option><option value="8k" selected>8k</option>
+              </select>
+            </div>
+          </div>
+          <div class="ext-param-row">
+            <label class="ext-param-label">分析方向</label>
+            <div class="ext-select-wrap">
+              <select class="ext-select" id="extAngle">
+                <option value="0" selected>0°（N/V，[001]）</option>
+                <option value="45">45°（R，[011]）</option>
+                <option value="90">90°（P，[001]）</option>
+              </select>
+            </div>
+          </div>
+          <button class="seg-btn" id="extRunBtn" disabled><span class="seg-btn-icon">▶</span> 运行特征提取</button>
+        </div>
+      </div>
+      <div class="ext-loading" id="extLoading" style="display:none">
+        <div class="loader-ring"></div><p class="loader-text" id="extLoaderText">正在计算 CCA 特征…</p>
+      </div>
+      <div id="extResultWrap" style="display:none">
+        <p class="seg-col-label" style="margin-bottom:12px">// 提取结果</p>
+        <div class="ext-table-wrap">
+          <table class="ext-table">
+            <thead><tr><th class="col-feature">特征</th><th class="col-raw">原始值</th><th class="col-norm">标准化值</th></tr></thead>
+            <tbody id="extTableBody"></tbody>
+          </table>
+        </div>
+        <div class="ext-nav" id="extNav" style="display:none">
+          <button class="ext-nav-btn" id="extPrev">◀</button>
+          <span class="ext-nav-label" id="extNavLabel">图像 1 / 1</span>
+          <button class="ext-nav-btn" id="extNext">▶</button>
+        </div>
+        <div class="seg-actions" style="margin-top:14px">
+          <button class="seg-btn seg-btn-secondary" id="extDownloadBtn"><span class="seg-btn-icon">↓</span> 下载 CSV</button>
+          <button class="seg-btn seg-btn-secondary" id="extResetBtn"><span class="seg-btn-icon">↺</span> 重置</button>
+        </div>
+      </div>
+    </div>
+  </template>
+
+  <!-- ===== MODULE 3 TEMPLATE ===== -->
+  <template id="tpl-prediction">
+    <div class="pred-layout">
+      <div class="pred-columns">
+        <div class="pred-group">
+          <p class="seg-col-label">// 服役条件</p>
+          <div class="pred-field">
+            <label class="pred-label">温度 <span class="pred-unit">℃</span></label>
+            <input class="pred-input" id="pTemp" type="number" placeholder="例：980" min="700" max="1200"/>
+            <p class="pred-hint">参考范围：760 — 1150 ℃</p>
+          </div>
+          <div class="pred-field">
+            <label class="pred-label">压力 <span class="pred-unit">MPa</span></label>
+            <input class="pred-input" id="pStress" type="number" placeholder="例：130" min="1" max="600"/>
+            <p class="pred-hint">参考范围：12 — 560 MPa</p>
+          </div>
+        </div>
+        <div class="pred-group">
+          <p class="seg-col-label">// 图像特征（来自模块 02）</p>
+          <div class="pred-field">
+            <label class="pred-label">UMAP1 <span class="pred-unit">归一化 [0,1]</span></label>
+            <input class="pred-input" id="pUmap1" type="number" placeholder="例：0.52" min="0" max="1" step="0.0001"/>
+          </div>
+          <div class="pred-field">
+            <label class="pred-label">UMAP2 <span class="pred-unit">归一化 [0,1]</span></label>
+            <input class="pred-input" id="pUmap2" type="number" placeholder="例：0.38" min="0" max="1" step="0.0001"/>
+          </div>
+          <div class="pred-field">
+            <label class="pred-label">γ 相宽度 ω <span class="pred-unit">标准化 (ω/1.5)</span></label>
+            <input class="pred-input" id="pOmega" type="number" placeholder="例：0.41" step="0.0001"/>
+          </div>
+          <div class="pred-field">
+            <label class="pred-label">γ' 相宽度 l <span class="pred-unit">标准化 (l/1.5)</span></label>
+            <input class="pred-input" id="pL" type="number" placeholder="例：0.60" step="0.0001"/>
+          </div>
+        </div>
+      </div>
+      <button class="seg-btn pred-run-btn" id="predRunBtn"><span class="seg-btn-icon">▶</span> 预测剩余寿命</button>
+      <div class="pred-loading" id="predLoading" style="display:none">
+        <div class="loader-ring"></div><p class="loader-text">GPR 模型推理中…</p>
+      </div>
+      <div class="pred-result" id="predResult" style="display:none">
+        <div class="pred-result-header"><span class="pred-result-label">// 预测结果</span></div>
+        <div class="pred-life-display">
+          <div class="pred-life-main">
+            <span class="pred-life-value" id="predLifeVal">—</span>
+            <span class="pred-life-unit">小时</span>
+          </div>
+          <div class="pred-life-sub" id="predLifeSub"></div>
+        </div>
+        <div class="pred-conf-wrap">
+          <div class="pred-conf-label">
+            <span id="predLow">—</span>
+            <span class="pred-conf-center">置信区间 (±1σ)</span>
+            <span id="predHigh">—</span>
+          </div>
+          <div class="pred-conf-track">
+            <div class="pred-conf-bar" id="predConfBar"></div>
+            <div class="pred-conf-marker" id="predConfMarker"></div>
+          </div>
+        </div>
+        <button class="seg-btn seg-btn-secondary pred-reset-btn" id="predResetBtn"><span class="seg-btn-icon">↺</span> 重新输入</button>
+      </div>
+    </div>
+  </template>
+
+  <!-- ===== MODULE 4 TEMPLATE ===== -->
+  <template id="tpl-full-pipeline">
+    <div class="full-layout">
+
+      <!-- Step 1: upload + conditions -->
+      <div class="full-top">
+
+        <div class="full-upload-group">
+          <p class="seg-col-label">// 上传原始图像（支持多张）</p>
+          <div class="drop-zone" id="fullDropZone">
+            <input type="file" id="fullFileInput" accept=".png,.jpg,.jpeg,.bmp,.tif,.tiff" multiple hidden/>
+            <div class="drop-icon">⬆</div>
+            <p class="drop-main">拖拽或点击上传</p>
+            <p class="drop-formats">PNG · JPG · BMP · TIF</p>
+          </div>
+          <div class="ext-file-list" id="fullFileList" style="display:none"></div>
+        </div>
+
+        <div class="full-params-group">
+          <p class="seg-col-label">// 服役条件 & 参数</p>
+
+          <div class="pred-field">
+            <label class="pred-label">温度 <span class="pred-unit">℃</span></label>
+            <input class="pred-input" id="fullTemp" type="number" placeholder="例：980"/>
+          </div>
+          <div class="pred-field">
+            <label class="pred-label">压力 <span class="pred-unit">MPa</span></label>
+            <input class="pred-input" id="fullStress" type="number" placeholder="例：130"/>
+          </div>
+          <div class="ext-param-row">
+            <label class="ext-param-label">放大倍数</label>
+            <div class="ext-select-wrap">
+              <select class="ext-select" id="fullMag">
+                <option value="3k">3k</option><option value="5k">5k</option><option value="8k" selected>8k</option>
+              </select>
+            </div>
+          </div>
+          <div class="ext-param-row">
+            <label class="ext-param-label">分析方向</label>
+            <div class="ext-select-wrap">
+              <select class="ext-select" id="fullAngle">
+                <option value="0" selected>0°（N/V，[001]）</option>
+                <option value="45">45°（R，[011]）</option>
+                <option value="90">90°（P，[001]）</option>
+              </select>
+            </div>
+          </div>
+
+          <button class="seg-btn" id="fullRunBtn" disabled>
+            <span class="seg-btn-icon">▶</span> 一键评估寿命
+          </button>
+        </div>
+      </div>
+
+      <!-- Loading -->
+      <div class="full-loading" id="fullLoading" style="display:none">
+        <div class="loader-ring"></div>
+        <p class="loader-text" id="fullLoaderText">正在处理图像…</p>
+      </div>
+
+      <!-- Results -->
+      <div id="fullResultWrap" style="display:none">
+        <p class="seg-col-label" style="margin-bottom:14px">// 寿命预测结果</p>
+
+        <!-- Single result display -->
+        <div class="full-result-card" id="fullResultCard">
+          <div class="full-filename" id="fullFilename"></div>
+          <div class="pred-life-display">
+            <div class="pred-life-main">
+              <span class="pred-life-value" id="fullLifeVal">—</span>
+              <span class="pred-life-unit">小时</span>
+            </div>
+            <div class="pred-life-sub" id="fullLifeSub"></div>
+          </div>
+          <div class="pred-conf-wrap">
+            <div class="pred-conf-label">
+              <span id="fullLow">—</span>
+              <span class="pred-conf-center">置信区间 (±1σ)</span>
+              <span id="fullHigh">—</span>
+            </div>
+            <div class="pred-conf-track">
+              <div class="pred-conf-bar" id="fullConfBar"></div>
+              <div class="pred-conf-marker" id="fullConfMarker"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Multi-image nav -->
+        <div class="ext-nav" id="fullNav" style="display:none">
+          <button class="ext-nav-btn" id="fullPrev">◀</button>
+          <span class="ext-nav-label" id="fullNavLabel">图像 1 / 1</span>
+          <button class="ext-nav-btn" id="fullNext">▶</button>
+        </div>
+
+        <div class="seg-actions" style="margin-top:14px">
+          <button class="seg-btn seg-btn-secondary" id="fullDownloadBtn">
+            <span class="seg-btn-icon">↓</span> 下载 CSV
+          </button>
+          <button class="seg-btn seg-btn-secondary" id="fullResetBtn">
+            <span class="seg-btn-icon">↺</span> 重置
+          </button>
+        </div>
+      </div>
+
+    </div>
+  </template>
+
+  <script src="main.js"></script>
+</body>
+</html>

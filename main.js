@@ -1,7 +1,7 @@
 // =============================================
 //  main.js
 // =============================================
-
+const API_BASE = 'http://58.87.65.31:5000';
 const MODULE_DATA = {
   '1': { index: '01', label: 'MODULE 01', title: '图像阈值分割' },
   '2': { index: '02', label: 'MODULE 02', title: '图像特征提取' },
@@ -93,7 +93,7 @@ function buildSegmentationUI() {
     statusText.textContent = text;
   }
   setStatus('loading', '正在检测模型状态…');
-  fetch('/api/status').then(r => r.json()).then(data => {
+  fetch(API_BASE + '/api/status').then(r => r.json()).then(data => {
     if (data.model_loaded) setStatus('ready', `模型已就绪：${data.model_file}`);
     else { setStatus('error', '模型未加载 — 请将 .pth 文件放入 models/ 并重启服务'); runBtn.disabled = true; }
   }).catch(() => setStatus('error', '无法连接后端 — 请确认 app.py 已启动（localhost:5000）'));
@@ -160,7 +160,7 @@ function buildSegmentationUI() {
       loaderText.textContent = `正在分割 ${i + 1} / ${selectedFiles.length}：${selectedFiles[i].name}`;
       try {
         const fd = new FormData(); fd.append('image', selectedFiles[i]);
-        const resp = await fetch('/api/segment', { method: 'POST', body: fd });
+        const resp = await fetch(API_BASE + '/api/segment', { method: 'POST', body: fd });
         if (!resp.ok) { const e = await resp.json(); throw new Error(e.error || `HTTP ${resp.status}`); }
         resultBlobs.push(await resp.blob());
       } catch (err) {
@@ -281,7 +281,7 @@ function buildExtractionUI() {
       fd.append('angle', extAngle.value);
       const steps = [[1200,'UMAP 降维中…'],[2500,'运行 CLD 割线分析…'],[4000,'GMM 拟合相宽度分布…'],[5500,'汇总特征结果…']];
       const timers = steps.map(([ms, txt]) => setTimeout(() => { extLoaderText.textContent = txt; }, ms));
-      const resp = await fetch('/api/extract', { method: 'POST', body: fd });
+      const resp = await fetch(API_BASE + '/api/extract', { method: 'POST', body: fd });
       timers.forEach(clearTimeout);
       if (!resp.ok) { const e = await resp.json(); throw new Error(e.error || `HTTP ${resp.status}`); }
       allResults = await resp.json(); currentIdx = 0;
@@ -400,7 +400,7 @@ function buildPredictionUI() {
     };
 
     try {
-      const resp = await fetch('/api/predict', {
+      const resp = await fetch(API_BASE + '/api/predict', {
         method:  'POST',
         headers: { 'Content-Type': 'application/json' },
         body:    JSON.stringify(payload),
@@ -625,7 +625,7 @@ function buildFullPipelineUI() {
       fd.append('magnification', fullMag.value);
       fd.append('angle',         fullAngle.value);
 
-      const resp = await fetch('/api/predict_full', { method: 'POST', body: fd });
+      const resp = await fetch(API_BASE + '/api/predict_full', { method: 'POST', body: fd });
       timers.forEach(clearTimeout);
 
       if (!resp.ok) { const e = await resp.json(); throw new Error(e.error || `HTTP ${resp.status}`); }

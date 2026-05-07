@@ -1,7 +1,7 @@
 // =============================================
 //  main.js
 // =============================================
-const API_BASE = 'https://58.87.65.31';
+const API_BASE = 'https://xxxx-xxxx.ngrok-free.app';
 const MODULE_DATA = {
   '1': { index: '01', label: 'MODULE 01', title: '图像阈值分割' },
   '2': { index: '02', label: 'MODULE 02', title: '图像特征提取' },

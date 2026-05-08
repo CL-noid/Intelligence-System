@@ -1,7 +1,7 @@
 // =============================================
 //  main.js
 // =============================================
-const API_BASE = 'https://fragrance-cartoons-collectibles-satisfactory.trycloudflare.com';
+const API_BASE = 'https://politicians-naturals-flag-legislative.trycloudflare.com';
 const MODULE_DATA = {
   '1': { index: '01', label: 'MODULE 01', title: '图像阈值分割' },
   '2': { index: '02', label: 'MODULE 02', title: '图像特征提取' },
